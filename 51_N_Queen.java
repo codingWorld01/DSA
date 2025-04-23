@@ -1,30 +1,54 @@
-import java.util.List;
-import java.util.ArrayList;
+import java.util.*;
 
-class N_Queen {
-    public char[][] solveNQueens(int n) {
-        char arr[][] = new char[n][n];
-
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                arr[i][j] = '.';
-            }
+class Solution {
+    public List<List<String>> solveNQueens(int n) {
+        List<List<String>> result = new ArrayList<>();
+        char[][] board = new char[n][n];
+        
+        for (char[] row : board) {
+            Arrays.fill(row, '.');
         }
 
-        return arr;
-
+        backtrack(0, board, result, new HashSet<>(), new HashSet<>(), new HashSet<>(), n);
+        return result;
     }
 
-    public static void main(String args[]) {
-        int n = 4;
-        char arr[][] = new N_Queen().solveNQueens(n);
+    private void backtrack(int row, char[][] board, List<List<String>> result,
+                           Set<Integer> cols, Set<Integer> diag1, Set<Integer> diag2, int n) {
+        if (row == n) {
+            result.add(buildBoard(board));
+            return;
+        }
 
-        for(int i = 0; i < n; i++) {
-            for(int j = 0; j < n; j++) {
-                System.out.print(arr[i][j] + " ");
+        for (int col = 0; col < n; col++) {
+            int d1 = row - col;
+            int d2 = row + col;
+
+            if (cols.contains(col) || diag1.contains(d1) || diag2.contains(d2)) {
+                continue; // Conflict, skip
             }
 
-            System.out.println();
+            // Place queen
+            board[row][col] = 'Q';
+            cols.add(col);
+            diag1.add(d1);
+            diag2.add(d2);
+
+            backtrack(row + 1, board, result, cols, diag1, diag2, n);
+
+            // Remove queen
+            board[row][col] = '.';
+            cols.remove(col);
+            diag1.remove(d1);
+            diag2.remove(d2);
         }
+    }
+
+    private List<String> buildBoard(char[][] board) {
+        List<String> boardList = new ArrayList<>();
+        for (char[] row : board) {
+            boardList.add(new String(row));
+        }
+        return boardList;
     }
 }
